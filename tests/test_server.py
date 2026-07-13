@@ -22,6 +22,15 @@ def test_unknown_target_is_rejected():
     assert response.get_json()["ok"] is False
 
 
+def test_head_routes_are_available():
+    app = create_app()
+    client = app.test_client()
+
+    assert client.head("/").status_code == 200
+    assert client.head("/api/traffic-flow").status_code == 200
+    assert client.head("/api/deploy-flow").status_code == 200
+
+
 def test_main_deploy_path_uses_configured_dockerhub_namespace(monkeypatch):
     monkeypatch.setattr(config, "DOCKERHUB_NAMESPACE", "example")
 
