@@ -33,6 +33,7 @@ $env:LAB1_SSH_KEY_PATH="C:\path\to\key"
 
 ```powershell
 python -m compileall app.py devmon
+python -m pytest
 ```
 
 ## Docker
