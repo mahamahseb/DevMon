@@ -1,5 +1,5 @@
 from devmon import config
-from devmon.server import _deploy_path, create_app
+from devmon.server import _deploy_flow, _deploy_path, create_app
 
 
 def test_index_renders_title():
@@ -44,3 +44,29 @@ def test_branch_deploy_path():
 
 def test_other_workload_deploy_path():
     assert _deploy_path("hello-world", "hello-world:latest") == "existing Minikube workload"
+
+
+def test_deploy_flow_groups_multiple_deployments_by_namespace():
+    class Result:
+        def __init__(self, command, stdout):
+            self.command = command
+            self.stdout = stdout
+
+    results = [
+        Result(
+            config.DEPLOY_COMMANDS[0],
+            "NAMESPACE NAME IMAGE READY AVAILABLE\n"
+            "progress-tracker backend image/backend:1 3 3\n"
+            "progress-tracker frontend image/frontend:1 3 3\n",
+        ),
+        Result(config.DEPLOY_COMMANDS[1], "NAMESPACE NAME READY STATUS RESTARTS IMAGE\n"),
+        Result(config.DEPLOY_COMMANDS[2], "NAMESPACE NAME TYPE CLUSTER-IP PORT\n"),
+        Result(config.DEPLOY_COMMANDS[3], "NAMESPACE NAME CLASS HOSTS ADDRESS\n"),
+        Result(config.DEPLOY_COMMANDS[4], ""),
+    ]
+
+    flow = _deploy_flow(results)
+
+    assert flow.count("+ progress-tracker") == 1
+    assert "backend" in flow
+    assert "frontend" in flow
