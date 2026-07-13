@@ -54,5 +54,5 @@ DEPLOY_COMMANDS = [
     "kubectl get pods -A -o custom-columns=NAMESPACE:.metadata.namespace,NAME:.metadata.name,READY:.status.containerStatuses[0].ready,STATUS:.status.phase,RESTARTS:.status.containerStatuses[0].restartCount,IMAGE:.spec.containers[0].image",
     "kubectl get svc -A -o custom-columns=NAMESPACE:.metadata.namespace,NAME:.metadata.name,TYPE:.spec.type,CLUSTER-IP:.spec.clusterIP,PORT:.spec.ports[0].port",
     "kubectl get ingress -A -o custom-columns=NAMESPACE:.metadata.namespace,NAME:.metadata.name,CLASS:.spec.ingressClassName,HOSTS:.spec.rules[*].host,ADDRESS:.status.loadBalancer.ingress[0].ip",
-    "pgrep -fa '/home/mah/actions-runner-devmon/.*/Runner.Listener|/home/mah/actions-runner-devmon/bin/Runner.Listener' || true",
+    "pgrep -fa '/home/mah/actions-runner-devmon/.*/[R]unner.Listener|/home/mah/actions-runner-devmon/bin/[R]unner.Listener' || true",
 ]
