@@ -33,6 +33,12 @@ spec:
               value: "192.168.239.141"
             - name: LAB1_USER
               value: mah
+            - name: LAB1_SSH_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: branch-devmon-ssh
+                  key: LAB1_SSH_PASSWORD
+                  optional: true
 ---
 apiVersion: v1
 kind: Service
