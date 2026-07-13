@@ -10,6 +10,11 @@ from .templates import INDEX_HTML
 def create_app() -> Flask:
     app = Flask(__name__)
 
+    @app.before_request
+    def short_circuit_head_requests():
+        if request.method == "HEAD" and request.path in {"/", "/api/traffic-flow", "/api/deploy-flow"}:
+            return "", 200
+
     @app.get("/")
     def index():
         return INDEX_HTML.format(
