@@ -18,7 +18,7 @@ def create_app() -> Flask:
             version=config.APP_VERSION,
         )
 
-    @app.head("/")
+    @app.route("/", methods=["HEAD"])
     def index_head():
         return "", 200
 
@@ -35,7 +35,7 @@ def create_app() -> Flask:
         command_results = ReadOnlySSHClient(target).run_commands(config.TRAFFIC_COMMANDS)
         return jsonify(_api_response(target, {"flow": _traffic_flow(command_results), "commands": [r.__dict__ for r in command_results]}))
 
-    @app.head("/api/traffic-flow")
+    @app.route("/api/traffic-flow", methods=["HEAD"])
     def traffic_flow_head():
         return "", 200
 
@@ -48,7 +48,7 @@ def create_app() -> Flask:
         command_results = ReadOnlySSHClient(target).run_commands(config.DEPLOY_COMMANDS)
         return jsonify(_api_response(target, {"flow": _deploy_flow(command_results), "commands": [r.__dict__ for r in command_results]}))
 
-    @app.head("/api/deploy-flow")
+    @app.route("/api/deploy-flow", methods=["HEAD"])
     def deploy_flow_head():
         return "", 200
 
