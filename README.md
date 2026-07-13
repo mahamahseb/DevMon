@@ -63,6 +63,14 @@ kubectl create secret generic devmon-ssh \
   --from-literal=LAB1_SSH_PASSWORD='REPLACE_ME'
 ```
 
+For the branch namespace:
+
+```bash
+kubectl create secret generic branch-devmon-ssh \
+  -n branch-devmon \
+  --from-literal=LAB1_SSH_PASSWORD='REPLACE_ME'
+```
+
 ## Deployment URLs
 
 ```text
