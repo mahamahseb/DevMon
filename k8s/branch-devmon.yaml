@@ -1,0 +1,79 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: branch-devmon
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: branch-devmon
+  namespace: branch-devmon
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: branch-devmon
+  template:
+    metadata:
+      labels:
+        app: branch-devmon
+    spec:
+      containers:
+        - name: branch-devmon
+          image: branch-devmon:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+          env:
+            - name: APP_BRANCH
+              value: CI
+            - name: APP_VERSION
+              value: branch
+            - name: LAB1_HOST
+              value: "192.168.239.141"
+            - name: LAB1_USER
+              value: mah
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: branch-devmon
+  namespace: branch-devmon
+spec:
+  selector:
+    app: branch-devmon
+  ports:
+    - name: http
+      port: 8000
+      targetPort: 8000
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: branch-devmon
+  namespace: branch-devmon
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: branch-devmon.mah.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: branch-devmon
+                port:
+                  number: 8000
+    - host: branch-devmon.192.168.239.141.sslip.io
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: branch-devmon
+                port:
+                  number: 8000

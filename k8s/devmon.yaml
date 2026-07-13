@@ -1,0 +1,85 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: devmon
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: devmon
+  namespace: devmon
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: devmon
+  template:
+    metadata:
+      labels:
+        app: devmon
+    spec:
+      containers:
+        - name: devmon
+          image: mahamah/devmon:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8000
+          env:
+            - name: APP_BRANCH
+              value: main
+            - name: APP_VERSION
+              value: latest
+            - name: LAB1_HOST
+              value: "192.168.239.141"
+            - name: LAB1_USER
+              value: mah
+            - name: LAB1_SSH_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: devmon-ssh
+                  key: LAB1_SSH_PASSWORD
+                  optional: true
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: devmon
+  namespace: devmon
+spec:
+  selector:
+    app: devmon
+  ports:
+    - name: http
+      port: 8000
+      targetPort: 8000
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: devmon
+  namespace: devmon
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: devmon.mah.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: devmon
+                port:
+                  number: 8000
+    - host: devmon.192.168.239.141.sslip.io
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: devmon
+                port:
+                  number: 8000

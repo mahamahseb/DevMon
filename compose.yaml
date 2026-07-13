@@ -1,0 +1,13 @@
+services:
+  devmon:
+    build: .
+    image: devmon:local
+    ports:
+      - "8000:8000"
+    environment:
+      APP_BRANCH: local
+      APP_VERSION: compose
+      LAB1_HOST: 192.168.239.141
+      LAB1_USER: mah
+      LAB1_SSH_PASSWORD: ${LAB1_SSH_PASSWORD:-}
+      LAB1_SSH_KEY_PATH: ${LAB1_SSH_KEY_PATH:-}
