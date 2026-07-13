@@ -140,19 +140,17 @@ def _deploy_flow(results):
     ingresses = _group_rows(_parse_table(data.get(config.DEPLOY_COMMANDS[3], "")))
     runner = data.get(config.DEPLOY_COMMANDS[4], "")
     sections = ["Deploy Flow", "", f"Runner: {runner or 'not detected'}", ""]
-    for row in deployments:
-        namespace = row.get("NAMESPACE", "")
+    deployments_by_namespace = _group_rows(deployments)
+    for namespace, namespace_deployments in deployments_by_namespace.items():
         if namespace in config.SYSTEM_NAMESPACES:
             continue
-        image = row.get("IMAGE", "")
         sections.append(f"+ {namespace}")
-        sections.append(f"  Deploy path: {_deploy_path(namespace, image)}")
+        sections.append(f"  Deploy path: {_deploy_path(namespace, _primary_image(namespace_deployments))}")
         sections.append(f"  Source: GitHub {config.GITHUB_REPOSITORY}")
         sections.append(f"  DockerHub: {config.DOCKERHUB_NAMESPACE}/devmon when using main deployment")
         sections.append("  lab1 self-hosted runner: devmon-minikube")
         sections.append(f"  Minikube namespace: {namespace}")
-        sections.append(f"  Deployment image: {image}")
-        sections.append(f"  Deployment status: ready={row.get('READY', '')} available={row.get('AVAILABLE', '')}")
+        sections.append(f"  Deployments: {_format_rows(namespace_deployments)}")
         sections.append(f"  Pods: {_format_rows(pods.get(namespace, []))}")
         sections.append(f"  Services: {_format_rows(services.get(namespace, []))}")
         sections.append(f"  Ingress: {_format_rows(ingresses.get(namespace, []))}")
@@ -171,6 +169,12 @@ def _deploy_path(namespace, image):
     if namespace == "branch-devmon" and image.startswith("branch-devmon:"):
         return "GitHub CI branch -> Minikube"
     return "existing Minikube workload"
+
+
+def _primary_image(deployments):
+    if not deployments:
+        return ""
+    return deployments[0].get("IMAGE", "")
 
 
 def _parse_table(text):
