@@ -157,7 +157,11 @@ def _deploy_flow(results):
 
 
 def _deploy_path(namespace, image):
-    if namespace == "devmon" and image.startswith(("mahamah/devmon:", "docker.io/mahamah/devmon:")):
+    remote_prefixes = (
+        f"{config.DOCKERHUB_NAMESPACE}/devmon:",
+        f"docker.io/{config.DOCKERHUB_NAMESPACE}/devmon:",
+    )
+    if namespace == "devmon" and image.startswith(remote_prefixes):
         return "GitHub -> DockerHub -> Minikube"
     if namespace == "branch-devmon" and image.startswith("branch-devmon:"):
         return "GitHub CI branch -> Minikube"
